@@ -27,7 +27,7 @@ Ext.extend(markdownEditor.Editor,Ext.Component,{
     ,initComponent: function() {
         MarkdownEditor.superclass.initComponent.call(this);
 
-        this.diffDOM = new diffDOM();
+        this.diffDOM = new diffDOM.DiffDOM();
         
         if (this.mdElementId && Ext.get(this.mdElementId)){
             Ext.onReady(this.render, this);
@@ -130,7 +130,7 @@ Ext.extend(markdownEditor.Editor,Ext.Component,{
 
         }, this);
 
-        if (markdownEditor.content[this.mdElementName]) {
+        if (markdownEditor.content && markdownEditor.content[this.mdElementName]) {
             this.editor.setValue(markdownEditor.content[this.mdElementName]);
         }
         this.editor.selection.clearSelection();
@@ -534,12 +534,15 @@ Ext.extend(markdownEditor.Editor,Ext.Component,{
         this.gutterToolbar.child('i.icon-archive').on('click', function () {
             MODx.load({
                 xtype: 'modx-browser-window'
+                //,openTo: 'assets/u/' + this.config.resource + '/'
+                //,rootId: 'assets/f/' + this.config.resource + '/'
                 ,source: parseInt(MODx.config['markdowneditor.general.source'])
                 ,hideSourceCombo: parseInt(MODx.config['markdowneditor.general.source_select'] || 0) != 1
                 ,onSelect: function(data){
                     var markup = '';
+                    var name = data.name || '';
                     if (data.preview) markup = '!';
-                    markup = markup + '[' + data.name + '](' + data.fullRelativeUrl + ' "' + data.name + '")';
+                    markup = markup + '[' + (data.ext ? name.replace('.' + data.ext, '') : name) + '](' + data.fullRelativeUrl + ')'; // + ' "' + data.name + '")';
 
                     this.editor.insert(markup);
                     this.editor.focus();
@@ -689,6 +692,8 @@ Ext.extend(markdownEditor.Editor,Ext.Component,{
 
         output = output.replace(/%5B/g, '[');
         output = output.replace(/%5D/g, ']');
+        output = output.replace(/<p>(\[\[\$widget([^<]*)\]\])<\/p>/g, '$1');
+
 
         if (MODx.config['markdowneditor.lp.parse_modx_tags'] == 1) {
             if (this.parseRequest) {
