@@ -173,6 +173,7 @@ trait Cards
 
     public function getCSS()
     {
+        return array(); //disable
         return array($this->md->getOption('cssUrl') . 'cards.css');
     }
 }

@@ -42,6 +42,7 @@ final class EmbedlyCards extends OEmbed implements iOEmbed
      */
     public function getHTML()
     {
+        return array(); //disable
         return array(
             "<script>
               (function(w, d){
